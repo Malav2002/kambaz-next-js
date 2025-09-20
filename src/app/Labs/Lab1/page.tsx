@@ -248,7 +248,7 @@ export default function Lab1() {
       {/* Anchor Links */}
       <h4>Anchor tag</h4>
       Please <a href="https://www.lipsum.com" id="wd-lipsum">click here</a> to get dummy text<br/>
-      <a href="https://github.com/yourusername" id="wd-github">My GitHub</a>
+      <a href="https://github.com/Malav2002" id="wd-github">My GitHub</a>
     </div>
   );
 }

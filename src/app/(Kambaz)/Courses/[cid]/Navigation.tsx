@@ -1,4 +1,7 @@
+"use client";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { use } from "react";
 
 export default function CourseNavigation() {
   return (

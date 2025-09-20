@@ -22,7 +22,8 @@ export default function Labs() {
           </Link>
         </li>
       </ul>
-      <p>Your Name: [Your Full Name Here]</p>
+      <p>Your Name: Malav Patel</p>
+      <p>Section: 04</p>
     </div>
   );
 }

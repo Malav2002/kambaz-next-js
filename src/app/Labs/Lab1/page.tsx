@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Lab1() {
   return (
     <div id="wd-lab1">
@@ -67,8 +69,9 @@ export default function Lab1() {
         <ol id="wd-your-favorite-recipe">
           <li>Preheat oven to 350°F</li>
           <li>Mix flour, sugar, and eggs</li>
-          <li>Add vanilla extract</li>
+          <li>Add vanilla extract and butter</li>
           <li>Bake for 25 minutes</li>
+          <li>Let cool and enjoy</li>
         </ol>
 
         <h5>Unordered List Tag</h5>
@@ -76,7 +79,7 @@ export default function Lab1() {
         <ul id="wd-my-books">
           <li>Dune</li>
           <li>Lord of the Rings</li>
-          <li>Ender's Game</li>
+          <li>Ender&apos;s Game</li>
           <li>Red Mars</li>
           <li>The Forever War</li>
         </ul>
@@ -86,6 +89,7 @@ export default function Lab1() {
           <li>The Great Gatsby</li>
           <li>To Kill a Mockingbird</li>
           <li>1984</li>
+          <li>The Catcher in the Rye</li>
         </ul>
       </div>
 
@@ -120,14 +124,48 @@ export default function Lab1() {
               <td>2/17/21</td>
               <td>95</td>
             </tr>
-            {/* Add more rows for Q4-Q10 */}
-            <tr><td>Q4</td><td>React</td><td>2/24/21</td><td>88</td></tr>
-            <tr><td>Q5</td><td>Node.js</td><td>3/3/21</td><td>92</td></tr>
-            <tr><td>Q6</td><td>Express</td><td>3/10/21</td><td>87</td></tr>
-            <tr><td>Q7</td><td>MongoDB</td><td>3/17/21</td><td>89</td></tr>
-            <tr><td>Q8</td><td>APIs</td><td>3/24/21</td><td>93</td></tr>
-            <tr><td>Q9</td><td>Testing</td><td>3/31/21</td><td>91</td></tr>
-            <tr><td>Q10</td><td>Deployment</td><td>4/7/21</td><td>86</td></tr>
+            <tr>
+              <td>Q4</td>
+              <td>React</td>
+              <td>2/24/21</td>
+              <td>88</td>
+            </tr>
+            <tr>
+              <td>Q5</td>
+              <td>Node.js</td>
+              <td>3/3/21</td>
+              <td>92</td>
+            </tr>
+            <tr>
+              <td>Q6</td>
+              <td>Express</td>
+              <td>3/10/21</td>
+              <td>87</td>
+            </tr>
+            <tr>
+              <td>Q7</td>
+              <td>MongoDB</td>
+              <td>3/17/21</td>
+              <td>89</td>
+            </tr>
+            <tr>
+              <td>Q8</td>
+              <td>APIs</td>
+              <td>3/24/21</td>
+              <td>93</td>
+            </tr>
+            <tr>
+              <td>Q9</td>
+              <td>Testing</td>
+              <td>3/31/21</td>
+              <td>91</td>
+            </tr>
+            <tr>
+              <td>Q10</td>
+              <td>Deployment</td>
+              <td>4/7/21</td>
+              <td>86</td>
+            </tr>
           </tbody>
           <tfoot>
             <tr>
@@ -138,19 +176,27 @@ export default function Lab1() {
         </table>
       </div>
 
-      {/* Images */}
+      {/* Images - Fixed */}
       <div id="wd-images">
         <h4>Image tag</h4>
         Loading an image from the internet: <br />
-        <img 
+        <Image 
           id="wd-starship" 
-          width="400px"
-          src="https://www.staradvertiser.com/wp-content/uploads/2021/08/web1_Starship-gap2.jpg" 
+          width={400}
+          height={300}
+          src="https://www.staradvertiser.com/wp-content/uploads/2021/08/web1_Starship-gap2.jpg"
+          alt="Starship rocket launch"
         />
         <br />
         Loading a local image:
         <br />
-        <img id="wd-teslabot" src="/images/teslabot.jpg" height="200px" />
+        <Image 
+          id="wd-teslabot" 
+          src="/images/teslabot.jpeg" 
+          width={200}
+          height={200}
+          alt="Tesla Bot humanoid robot"
+        />
       </div>
 
       {/* Forms */}
@@ -181,7 +227,10 @@ export default function Lab1() {
           <textarea id="wd-textarea" cols={30} rows={10}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
             tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, 
-            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu 
+            fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in 
+            culpa qui officia deserunt mollit anim id est laborum.
           </textarea>
 
           <h5 id="wd-buttons">Buttons</h5>
@@ -238,7 +287,7 @@ export default function Lab1() {
           <input type="number" defaultValue="100000" placeholder="1000" id="wd-text-fields-salary-start"/><br/>
           
           <label htmlFor="wd-text-fields-rating"> Rating: </label>
-          <input type="range" defaultValue="4" max="5" placeholder="Doe" id="wd-text-fields-rating"/><br/>
+          <input type="range" defaultValue="4" max="5" id="wd-text-fields-rating"/><br/>
           
           <label htmlFor="wd-text-fields-dob"> Date of birth: </label>
           <input type="date" defaultValue="2000-01-21" id="wd-text-fields-dob"/><br/>
@@ -248,7 +297,7 @@ export default function Lab1() {
       {/* Anchor Links */}
       <h4>Anchor tag</h4>
       Please <a href="https://www.lipsum.com" id="wd-lipsum">click here</a> to get dummy text<br/>
-      <a href="https://github.com/Malav2002" id="wd-github">My GitHub</a>
+      <a href="https://github.com/yourusername" id="wd-github">My GitHub</a>
     </div>
   );
 }

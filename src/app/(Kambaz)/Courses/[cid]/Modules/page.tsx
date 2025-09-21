@@ -1,6 +1,20 @@
 export default function Modules() {
   return (
     <div>
+      {/* Add Module Controls */}
+      <div id="wd-modules-controls" className="text-nowrap">
+        <button id="wd-collapse-all">Collapse All</button>
+        <button id="wd-view-progress">View Progress</button>
+        <select id="wd-publish-all">
+          <option>Publish All</option>
+          <option>Publish All Items</option>
+          <option>Unpublish All</option>
+        </select>
+        <button id="wd-add-module-btn">+ Module</button>
+      </div>
+      <br /><br />
+
+      {/* Existing Modules List */}
       <ul id="wd-modules">
         <li className="wd-module">
           <div className="wd-title">Week 1</div>

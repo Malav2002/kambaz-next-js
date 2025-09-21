@@ -1,6 +1,6 @@
 export default function AssignmentEditor() {
   return (
-    <div id="wd-assignments-editor">
+    <div id="wd-assignments-editor" style={{padding: "20px"}}>
       <label htmlFor="wd-name">Assignment Name</label>
       <input id="wd-name" defaultValue="A1 - ENV + HTML" />
       <br /><br />
@@ -84,10 +84,11 @@ export default function AssignmentEditor() {
       <table>
         <tbody>
           <tr>
-            <td align="right" valign="top">
+            <td align="left" valign="top">
               <label htmlFor="wd-assign-to">Assign to</label>
-            </td>
-            <td>
+         
+            <br />
+            
               <input id="wd-assign-to" defaultValue="Everyone" />
             </td>
           </tr>
@@ -101,7 +102,7 @@ export default function AssignmentEditor() {
           </tr>
           
           <tr>
-            <td align="right" valign="top">
+            <td align="left" valign="top">
               <label htmlFor="wd-available-from" >Available from</label>
               <br/>
               <input type="date" id="wd-available-from" defaultValue="2024-05-06" style={{marginRight: "10px"}} />

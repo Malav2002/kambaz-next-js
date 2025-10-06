@@ -1,8 +1,8 @@
 export default function Zoom() {
   return (
-    <div id="wd-zoom">
-      <h2>Zoom</h2>
-      <p>Zoom meetings and recordings will appear here.</p>
+    <div id="wd-zoom-page">
+      <h1>Zoom Page</h1>
+      <p>This is the Zoom page for the course.</p>
     </div>
   );
 }

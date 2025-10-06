@@ -1,124 +1,188 @@
+import {
+  Button,
+  Col,
+  FormControl,
+  FormLabel,
+  FormSelect,
+  FormCheck,
+  Row,
+  Container,
+} from "react-bootstrap";
+
 export default function AssignmentEditor() {
   return (
-    <div id="wd-assignments-editor" style={{padding: "20px"}}>
-      <label htmlFor="wd-name">Assignment Name</label>
-      <input id="wd-name" defaultValue="A1 - ENV + HTML" />
-      <br /><br />
-      
-      <textarea id="wd-description" rows={5} cols={50}>
-        The assignment is available online Submit a link to the landing page of your Web application running on Netlify. The landing page should include the following: Your full name and section Links to each of the lab assignments Link to the Kanbas application Links to all relevant source code repositories The Kanbas application should include a link to navigate back to the landing page.
-      </textarea>
-      <br />
-      
-      <table>
-        <tbody>
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-points">Points</label>
-            </td>
-            <td>
-              <input id="wd-points" defaultValue={100} />
-            </td>
-          </tr>
-          
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-group">Assignment Group</label>
-            </td>
-            <td>
-              <select id="wd-group">
-                <option value="ASSIGNMENTS">ASSIGNMENTS</option>
-                <option value="QUIZZES">QUIZZES</option>
-                <option value="EXAMS">EXAMS</option>
-                <option value="PROJECT">PROJECT</option>
-              </select>
-            </td>
-          </tr>
-          
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-display-grade-as">Display Grade as</label>
-            </td>
-            <td>
-              <select id="wd-display-grade-as">
-                <option value="Percentage">Percentage</option>
-                <option value="Points">Points</option>
-                <option value="Letter">Letter Grade</option>
-              </select>
-            </td>
-          </tr>
-          
-          <tr>
-            <td align="right" valign="top">
-              <label htmlFor="wd-submission-type">Submission Type</label>
-            </td>
-            <td>
-              <select id="wd-submission-type">
-                <option value="Online">Online</option>
-                <option value="Paper">On Paper</option>
-                <option value="External">External Tool</option>
-              </select>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <br />
-      <h4>Online Entry Options</h4>
-      <input type="checkbox" id="wd-text-entry" />
-      <label htmlFor="wd-text-entry">Text Entry</label><br />
-      
-      <input type="checkbox" id="wd-website-url" />
-      <label htmlFor="wd-website-url">Website URL</label><br />
-      
-      <input type="checkbox" id="wd-media-recordings" />
-      <label htmlFor="wd-media-recordings">Media Recordings</label><br />
-      
-      <input type="checkbox" id="wd-student-annotation" />
-      <label htmlFor="wd-student-annotation">Student Annotation</label><br />
-      
-      <input type="checkbox" id="wd-file-upload" />
-      <label htmlFor="wd-file-upload">File Uploads</label><br />
-      
-      <br />
-      <table>
-        <tbody>
-          <tr>
-            <td align="left" valign="top">
-              <label htmlFor="wd-assign-to">Assign to</label>
-         
-            <br />
-            
-              <input id="wd-assign-to" defaultValue="Everyone" />
-            </td>
-          </tr>
-          
-          <tr>
-            <td align="left" valign="top">
-              <label htmlFor="wd-due-date">Due</label>
-              <br />
-              <input type="date" id="wd-due-date" defaultValue="2024-05-13" />
-            </td>
-          </tr>
-          
-          <tr>
-            <td align="left" valign="top">
-              <label htmlFor="wd-available-from" >Available from</label>
-              <br/>
-              <input type="date" id="wd-available-from" defaultValue="2024-05-06" style={{marginRight: "10px"}} />
-            </td>
-            <td>
-              <label htmlFor="wd-available-until" style={{marginLeft: "10px"}}>Until</label>
-              <br/>
-              <input type="date" id="wd-available-until" defaultValue="2024-05-20" style={{marginLeft: "10px"}} />
-              <div style={{textAlign: "right", marginTop: "10px"}}>
-                <button>Cancel</button>
-                <button style={{marginLeft: "10px"}}>Save</button>
+    <Container id="wd-assignments-editor">
+      <FormLabel htmlFor="wd-name">Assignment Name</FormLabel>
+      <FormControl
+        id="wd-name"
+        defaultValue="A1 - ENV + HTML"
+        className="mb-3"
+      />
+
+      <FormControl
+        as="textarea"
+        id="wd-description"
+        rows={10}
+        className="mb-3"
+        defaultValue={`The assignment is available online Submit a link to the landing page of your Web application running on Netlify.
+
+The landing page should include the following:
+
+• Your full name and section
+• Links to each of the lab assignments
+• Link to the Kanbas application
+• Links to all relevant source code repositories
+
+The Kanbas application should include a link to navigate back to the landing page.`}
+      />
+
+      <Row className="mb-3">
+        <FormLabel column sm={2} className="wd-assignment-details-label">
+          Points
+        </FormLabel>
+        <Col sm={10}>
+          <FormControl id="wd-points" defaultValue={100} type="number" />
+        </Col>
+      </Row>
+
+      <Row className="mb-3">
+        <FormLabel column sm={2} className="wd-assignment-details-label">
+          Assignment Group
+        </FormLabel>
+        <Col sm={10}>
+          <FormSelect id="wd-group">
+            <option>ASSIGNMENTS</option>
+            <option>QUIZZES</option>
+            <option>EXAMS</option>
+          </FormSelect>
+        </Col>
+      </Row>
+
+      <Row className="mb-3">
+        <FormLabel column sm={2} className="wd-assignment-details-label">
+          Display Grade as
+        </FormLabel>
+        <Col sm={10}>
+          <FormSelect id="wd-display-grade-as">
+            <option>Percentage</option>
+            <option>Points</option>
+          </FormSelect>
+        </Col>
+      </Row>
+
+      <Row className="mb-3">
+        <FormLabel column sm={2} className="wd-assignment-details-label">
+          Submission Type
+        </FormLabel>
+        <Col sm={10}>
+          <div className="border p-3 rounded">
+            <FormSelect id="wd-submission-type" className="mb-3">
+              <option>Online</option>
+              <option>In-Person</option>
+            </FormSelect>
+
+            <div>
+              <strong>Online Entry Options</strong>
+              <div className="mt-2">
+                <FormCheck
+                  type="checkbox"
+                  id="wd-text-entry"
+                  label="Text Entry"
+                  className="m-2"
+                />
+                <FormCheck
+                  type="checkbox"
+                  id="wd-website-url"
+                  label="Website URL"
+                  className="m-2"
+                  defaultChecked
+                />
+                <FormCheck
+                  type="checkbox"
+                  id="wd-media-recordings"
+                  label="Media Recordings"
+                  className="m-2"
+                />
+                <FormCheck
+                  type="checkbox"
+                  id="wd-student-annotation"
+                  label="Student Annotation"
+                  className="m-2"
+                />
+                <FormCheck
+                  type="checkbox"
+                  id="wd-file-upload"
+                  label="File Upload"
+                  className="m-2"
+                />
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            </div>
+          </div>
+        </Col>
+      </Row>
+
+      <Row className="mb-3">
+        <FormLabel column sm={2} className="wd-assignment-details-label">
+          Assign
+        </FormLabel>
+        <Col sm={10}>
+          <div className="border p-3 rounded">
+            <FormLabel htmlFor="wd-assign-to">
+              <strong>Assign to</strong>
+            </FormLabel>
+            <FormSelect multiple id="wd-assign-to" className="mb-3">
+              <option>Everyone</option>
+              <option>Group 1</option>
+              <option>Group 2</option>
+              <option>Group 3</option>
+            </FormSelect>
+
+            <FormLabel htmlFor="wd-due-date">
+              <strong>Due</strong>
+            </FormLabel>
+            <FormControl
+              type="date"
+              id="wd-due-date"
+              defaultValue="2023-10-20"
+              className="mb-3"
+            />
+
+            <Row>
+              <Col sm={6}>
+                <FormLabel htmlFor="wd-available-from">
+                  <strong>Available From</strong>
+                </FormLabel>
+                <FormControl
+                  type="date"
+                  id="wd-available-from"
+                  defaultValue="2023-10-01"
+                />
+              </Col>
+              <Col sm={6}>
+                <FormLabel htmlFor="wd-available-until">
+                  <strong>Until</strong>
+                </FormLabel>
+                <FormControl
+                  type="date"
+                  id="wd-available-until"
+                  defaultValue="2023-10-21"
+                />
+              </Col>
+            </Row>
+          </div>
+        </Col>
+      </Row>
+
+      <hr />
+
+      <div className="text-end">
+        <Button variant="secondary" className="me-2" id="wd-cancel-assignment">
+          Cancel
+        </Button>
+        <Button variant="danger" id="wd-save-assignment">
+          Save
+        </Button>
+      </div>
+    </Container>
   );
 }

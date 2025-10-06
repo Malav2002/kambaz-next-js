@@ -1,8 +1,8 @@
 export default function Grades() {
   return (
-    <div id="wd-grades">
-      <h2>Grades</h2>
-      <p>Student grades will appear here.</p>
+    <div id="wd-grades-page">
+      <h1>Grades Page</h1>
+      <p>This is the Grades page for the course.</p>
     </div>
   );
 }

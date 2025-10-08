@@ -8,7 +8,7 @@ import ModuleControlButtons from "./ModuleControlButtons";
 
 export default function Modules() {
   return (
-    <Container>
+    <div>
       <ModulesControls />
       <br />
       <br />
@@ -93,6 +93,6 @@ export default function Modules() {
           </ListGroup>
         </ListGroup.Item>
       </ListGroup>
-    </Container>
+    </div>
   );
 }

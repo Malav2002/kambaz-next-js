@@ -17,7 +17,7 @@ body * {
   width: 300px;
 }
 #wd-dashboard-title {
-  font-size: larger;
+  font-size: 3rem;
 }
 .wd-dashboard-course-description {
   height: 100px;
@@ -47,4 +47,12 @@ body * {
   .wd-assignment-details-label {
     text-align: right;
   }
+}
+
+#wd-courses-title span {
+  font-size: 2rem;
+}
+
+#wd-dashboard-published {
+  font-size: 1.5rem;
 }

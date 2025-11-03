@@ -3,7 +3,7 @@ import Modules from "../Modules/page";
 import CourseStatus from "./Status";
 export default function Home() {
   return (
-    <div id="wd-home">
+    <Container id="wd-home">
       <div className="d-flex" id="wd-home">
         <div className="flex-fill me-3">
           <Modules />
@@ -12,6 +12,6 @@ export default function Home() {
           <CourseStatus />
         </div>
       </div>
-    </div>
+    </Container>
   );
 }

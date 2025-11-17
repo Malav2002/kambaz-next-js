@@ -1,32 +1,34 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
+
 export default function CourseNavigation() {
-  const path = usePathname();
-  const cid = path.split("/")[2];
-  const links = [
-    "Home",
-    "Modules",
-    "Piazza",
-    "Zoom",
-    "Assignments",
-    "Quizzes",
-    "Grades",
-    "People",
-  ];
-  return (
-    <div id="wd-courses-navigation" className="wd list-group fs-5 rounded-0">
-      {links.map((link) => (
-        <Link
-          key={link}
-          href={`/Courses/${cid}/${link}`}
-          id={`wd-course-${link.toLowerCase()}-link`}
-          className={`list-group-item border-0
-            ${path.includes(link) ? "active" : "text-danger"}`}
-        >
-          {link}
-        </Link>
-      ))}
-    </div>
-  );
+    const params = useParams<{ cid: string }>();
+    const pathname = usePathname();
+    const cid = params.cid;
+    const encodedCid = encodeURIComponent(cid);
+    const links = ["Home", "Modules", "Piazza", "Zoom", "Assignments", "Quizzes", "Grades", "People"];
+
+    return (
+        <div id="wd-courses-navigation" className="wd list-group fs-5 rounded-0">
+            {links.map((label) => {
+                const href =
+                    label === "People"
+                        ? `/Courses/${encodedCid}/People/Table`
+                        : `/Courses/${encodedCid}/${label}`;
+                const isActive = pathname?.startsWith(href);
+                const linkId = `wd-course-${label.toLowerCase()}-link`;
+                return (
+                    <Link
+                        key={label}
+                        href={href}
+                        id={linkId}
+                        className={`list-group-item border-0 ${isActive ? "active" : "text-danger"}`}
+                    >
+                        {label}
+                    </Link>
+                );
+            })}
+        </div>
+    );
 }

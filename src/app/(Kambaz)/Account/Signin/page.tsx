@@ -1,32 +1,33 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import * as client from "../client";
 import Link from "next/link";
-import { redirect } from "next/dist/client/components/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { setCurrentUser } from "../reducer";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import * as db from "../../Database";
-import { Container, FormControl, Button } from "react-bootstrap";
+import { FormControl, Button } from "react-bootstrap";
 
 export default function Signin() {
-  const [credentials, setCredentials] = useState<any>({});
+  const [credentials, setCredentials] = useState<any>({
+    username: "dark_knight",
+    password: "wayne123",
+  });  
   const dispatch = useDispatch();
-  const signin = () => {
-    const user = db.users.find(
-      (u: any) =>
-        u.username === credentials.username &&
-        u.password === credentials.password
-    );
+  const router = useRouter();
+
+  const signin = async () => {
+    const user = await client.signin(credentials);
     if (!user) return;
     dispatch(setCurrentUser(user));
     redirect("/Dashboard");
   };
 
   return (
-    <Container id="wd-signin-screen" style={{ width: "300px" }}>
+    <div id="wd-signin-screen">
       <h1>Sign in</h1>
       <FormControl
-        defaultValue={credentials.username}
+        value={credentials.username}
         onChange={(e) =>
           setCredentials({ ...credentials, username: e.target.value })
         }
@@ -35,7 +36,7 @@ export default function Signin() {
         className="mb-2"
       />
       <FormControl
-        defaultValue={credentials.password}
+        value={credentials.password}
         onChange={(e) =>
           setCredentials({ ...credentials, password: e.target.value })
         }
@@ -52,8 +53,8 @@ export default function Signin() {
         Sign in
       </Button>
       <Link id="wd-signup-link" href="Signup">
-        Signup
+        Sign up
       </Link>
-    </Container>
+    </div>
   );
 }

@@ -1,280 +1,295 @@
 "use client";
 
-import { redirect, useParams } from "next/navigation";
-import {
-  Button,
-  Col,
-  FormControl,
-  FormLabel,
-  FormSelect,
-  FormCheck,
-  Row,
-  Container,
-} from "react-bootstrap";
-
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { Container, Row, Col, Form } from "react-bootstrap";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addAssignment, updateAssignment } from "../reducer";
-import { useState } from "react";
+import * as client from "../../../client";
 
-export default function AssignmentEditor() {
-  const { cid, aid } = useParams();
+export default function AssignmentPage() {
+  const { cid, aid } = useParams<{ cid: string; aid: string }>();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useDispatch();
-  const { assignments } = useSelector(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (state: any) => state.assignmentsReducer
-  );
-
+  
+  // Check if this is a new assignment or editing existing
+  const isNew = aid === "new" || searchParams.get("new") === "true";
+  
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const assignment = assignments.find((a: any) => a._id === aid);
-  const editMode = assignment ? true : false;
+  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
 
-  const { currentUser } = useSelector(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (state: any) => state.accountReducer
-  );
-  const viewMode = currentUser.role === "STUDENT" ? true : false;
+  // Find existing assignment if editing
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const existingAssignment = assignments.find((item: any) => item.course === cid && item._id === aid && aid !== "new");
 
-  const [assignmentState, setAssignmentState] = useState(
-    assignment || {
-      _id: aid,
-      course: cid,
+  // Form state
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [points, setPoints] = useState(0);
+  const [dueOn, setDueOn] = useState("");
+  const [availableOn, setAvailableOn] = useState("");
+  const [availableUntil, setAvailableUntil] = useState("");
+
+  // Initialize form with existing assignment data
+  useEffect(() => {
+    if (!isNew && existingAssignment) {
+      setTitle(existingAssignment.title || "");
+      setDescription(existingAssignment.description || "");
+      setPoints(existingAssignment.points ?? 0);
+      setDueOn(existingAssignment.dueOn?.slice(0, 16) || "");
+      setAvailableOn(existingAssignment.availableOn?.slice(0, 16) || "");
+      setAvailableUntil(existingAssignment.availableUntil?.slice(0, 16) || "");
     }
-  );
+  }, [isNew, existingAssignment]);
+
+  const handleSave = async () => {
+    if (!title.trim()) {
+      alert("Please enter an assignment name");
+      return;
+    }
+
+    if (!cid || Array.isArray(cid)) return;
+
+    try {
+      if (isNew) {
+        // Create new assignment
+        const newAssignment = await client.createAssignmentForCourse(cid, {
+          title,
+          description,
+          points,
+          dueOn: dueOn || null,
+          availableOn: availableOn || null,
+          availableUntil: availableUntil || null,
+        });
+        dispatch(addAssignment(newAssignment));
+      } else if (existingAssignment) {
+        // Update existing assignment
+        const updatedAssignment = await client.updateAssignment({
+          ...existingAssignment,
+          title,
+          description,
+          points,
+          dueOn: dueOn || null,
+          availableOn: availableOn || null,
+          availableUntil: availableUntil || null,
+        });
+        dispatch(updateAssignment(updatedAssignment));
+      }
+
+      // Navigate back to assignments
+      router.push(`/Courses/${cid}/Assignments`);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to save assignment. Please try again.");
+    }
+  };
+
+  const handleCancel = () => {
+    router.push(`/Courses/${cid}/Assignments`);
+  };
+
+  // Edit form for new or existing assignments
   return (
-    <Container id="wd-assignments-editor">
-      <FormLabel htmlFor="wd-name">Assignment Name</FormLabel>
-      <FormControl
-        id="wd-name"
-        defaultValue={assignment?.title}
-        className="mb-3"
-        onChange={(e) =>
-          setAssignmentState({ ...assignmentState, title: e.target.value })
-        }
-      />
+    <Container fluid id="wd-assignments-editor" className="py-2">
+      <Form>
+        {/* Assignment name */}
+        <Row className="g-3 mb-4">
+          <Col sm={12} md={8} lg={7}>
+            <Form.Group controlId="wd-name">
+              <Form.Label className="fw-semibold">Assignment Name</Form.Label>
+              <Form.Control
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Enter assignment name"
+              />
+            </Form.Group>
+          </Col>
+        </Row>
 
-      <FormControl
-        as="textarea"
-        id="wd-description"
-        rows={5}
-        className="mb-3"
-        defaultValue={assignment?.description}
-        onChange={(e) =>
-          setAssignmentState({
-            ...assignmentState,
-            description: e.target.value,
-          })
-        }
-      />
+        {/* Description */}
+        <Row className="g-3 mb-4">
+          <Col sm={12} md={8} lg={7}>
+            <Form.Group controlId="wd-description">
+              <Form.Label className="fw-semibold">Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={4}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter assignment description"
+              />
+            </Form.Group>
+          </Col>
+        </Row>
 
-      <Row className="mb-3">
-        <FormLabel column sm={2} className="wd-assignment-details-label">
-          Points
-        </FormLabel>
-        <Col sm={10}>
-          <FormControl
-            id="wd-points"
-            defaultValue={assignment?.points}
-            type="number"
-            onChange={(e) =>
-              setAssignmentState({
-                ...assignmentState,
-                points: Number(e.target.value),
-              })
-            }
-          />
-        </Col>
-      </Row>
-
-      {viewMode && (
-        <>
-          <Row className="mb-3">
-            <FormLabel column sm={2} className="wd-assignment-details-label">
-              Assignment Group
-            </FormLabel>
-            <Col sm={10}>
-              <FormSelect id="wd-group" defaultValue="ASSIGNMENTS">
-                <option>ASSIGNMENTS</option>
-                <option>QUIZZES</option>
-                <option>EXAMS</option>
-              </FormSelect>
-            </Col>
-          </Row>
-
-          <Row className="mb-3">
-            <FormLabel column sm={2} className="wd-assignment-details-label">
-              Display Grade as
-            </FormLabel>
-            <Col sm={10}>
-              <FormSelect id="wd-display-grade-as">
-                <option>Percentage</option>
-                <option>Points</option>
-              </FormSelect>
-            </Col>
-          </Row>
-
-          <Row className="mb-3">
-            <FormLabel column sm={2} className="wd-assignment-details-label">
-              Submission Type
-            </FormLabel>
-            <Col sm={10}>
-              <div className="border p-3 rounded">
-                <FormSelect id="wd-submission-type" className="mb-3">
-                  <option>Online</option>
-                  <option>In-Person</option>
-                </FormSelect>
-
-                <div>
-                  <strong>Online Entry Options</strong>
-                  <div className="mt-2">
-                    <FormCheck
-                      type="checkbox"
-                      id="wd-text-entry"
-                      label="Text Entry"
-                      className="m-2"
-                    />
-                    <FormCheck
-                      type="checkbox"
-                      id="wd-website-url"
-                      label="Website URL"
-                      className="m-2"
-                      defaultChecked
-                    />
-                    <FormCheck
-                      type="checkbox"
-                      id="wd-media-recordings"
-                      label="Media Recordings"
-                      className="m-2"
-                    />
-                    <FormCheck
-                      type="checkbox"
-                      id="wd-student-annotation"
-                      label="Student Annotation"
-                      className="m-2"
-                    />
-                    <FormCheck
-                      type="checkbox"
-                      id="wd-file-upload"
-                      label="File Upload"
-                      className="m-2"
-                    />
-                  </div>
-                </div>
-              </div>
-            </Col>
-          </Row>
-        </>
-      )}
-      <Row className="mb-3">
-        <FormLabel column sm={2} className="wd-assignment-details-label">
-          Assign
-        </FormLabel>
-        <Col sm={10}>
-          <div className="border p-3 rounded">
-            {viewMode && (
-              <>
-                <FormLabel htmlFor="wd-assign-to">
-                  <strong>Assign to</strong>
-                </FormLabel>
-                <FormSelect multiple id="wd-assign-to" className="mb-3">
-                  <option>Everyone</option>
-                  <option>Group 1</option>
-                  <option>Group 2</option>
-                  <option>Group 3</option>
-                </FormSelect>
-              </>
-            )}
-
-            <FormLabel htmlFor="wd-due-date">
-              <strong>Due</strong>
-            </FormLabel>
-            <FormControl
-              type="date"
-              id="wd-due-date"
-              defaultValue={assignment?.dueDate}
-              className="mb-3"
-              onChange={(e) =>
-                setAssignmentState({
-                  ...assignmentState,
-                  dueDate: e.target.value,
-                })
-              }
+        {/* Points */}
+        <Row className="align-items-center g-3 mb-3">
+          <Col sm={3} md={2} className="text-sm-end">
+            <Form.Label htmlFor="wd-points">Points</Form.Label>
+          </Col>
+          <Col sm={9} md={6} lg={5}>
+            <Form.Control
+              id="wd-points"
+              type="number"
+              value={points}
+              onChange={(e) => setPoints(Number(e.target.value))}
             />
+          </Col>
+        </Row>
 
-            <Row>
-              <Col sm={6}>
-                <FormLabel htmlFor="wd-available-from">
-                  <strong>Available From</strong>
-                </FormLabel>
-                <FormControl
-                  type="date"
-                  id="wd-available-from"
-                  defaultValue={assignment?.availableDate}
-                  onChange={(e) =>
-                    setAssignmentState({
-                      ...assignmentState,
-                      availableDate: e.target.value,
-                    })
-                  }
-                />
-              </Col>
-              <Col sm={6}>
-                <FormLabel htmlFor="wd-available-until">
-                  <strong>Until</strong>
-                </FormLabel>
-                <FormControl
-                  type="date"
-                  id="wd-available-until"
-                  defaultValue={assignment?.availableUntil}
-                  onChange={(e) =>
-                    setAssignmentState({
-                      ...assignmentState,
-                      availableUntil: e.target.value,
-                    })
-                  }
-                />
-              </Col>
-            </Row>
-          </div>
-        </Col>
-      </Row>
+        {/* Assignment group */}
+        <Row className="align-items-center g-3 mb-3">
+          <Col sm={3} md={2} className="text-sm-end">
+            <Form.Label htmlFor="wd-group">Assignment Group</Form.Label>
+          </Col>
+          <Col sm={9} md={6} lg={5}>
+            <Form.Select id="wd-group" defaultValue="ASSIGNMENTS">
+              <option>ASSIGNMENTS</option>
+            </Form.Select>
+          </Col>
+        </Row>
 
-      <hr />
+        {/* Display grade */}
+        <Row className="align-items-center g-3 mb-3">
+          <Col sm={3} md={2} className="text-sm-end">
+            <Form.Label htmlFor="wd-display-grade-as">Display Grade as</Form.Label>
+          </Col>
+          <Col sm={9} md={6} lg={5}>
+            <Form.Select id="wd-display-grade-as" defaultValue="Percentage">
+              <option>Percentage</option>
+            </Form.Select>
+          </Col>
+        </Row>
 
-      {!viewMode && (
-        <div className="text-end">
-          <Button
-            variant="secondary"
-            className="me-2"
-            id="wd-cancel-assignment"
-            onClick={() => redirect(`/Courses/${cid}/Assignments`)}
+        {/* Submission type */}
+        <Row className="g-3 mb-4">
+          <Col sm={3} md={2} className="text-sm-end">
+            <Form.Label htmlFor="wd-submission-type">Submission Type</Form.Label>
+          </Col>
+          <Col sm={9} md={6} lg={5}>
+            <div className="border rounded p-3">
+              <Form.Select
+                id="wd-submission-type"
+                className="mb-3"
+                defaultValue="Online"
+              >
+                <option>Online</option>
+              </Form.Select>
+
+              <div className="fw-semibold mb-2">Online Entry Options</div>
+
+              <Form.Check
+                id="wd-text-entry"
+                className="mb-2"
+                label="Text Entry"
+              />
+              <Form.Check
+                id="wd-website-url"
+                className="mb-2"
+                label="Website URL"
+                defaultChecked
+              />
+              <Form.Check
+                id="wd-media-recordings"
+                className="mb-2"
+                label="Media Recordings"
+              />
+              <Form.Check
+                id="wd-student-annotation"
+                className="mb-2"
+                label="Student Annotation"
+              />
+              <Form.Check id="wd-file-upload" label="File Uploads" />
+            </div>
+          </Col>
+        </Row>
+
+        {/* Assign section */}
+        <Row className="g-3 mb-4">
+          <Col sm={3} md={2} className="text-sm-end">
+            <Form.Label className="pt-2">Assign</Form.Label>
+          </Col>
+          <Col sm={9} md={6} lg={5}>
+            <div className="border rounded p-3">
+              <Form.Group className="mb-3">
+                <Form.Label htmlFor="wd-assign-to" className="fw-semibold">
+                  Assign to
+                </Form.Label>
+                <Form.Control id="wd-assign-to" defaultValue="Everyone" />
+              </Form.Group>
+
+              <Row className="g-3">
+                <Col xs={12}>
+                  <Form.Group controlId="wd-due-date">
+                    <Form.Label className="fw-semibold">Due</Form.Label>
+                    <Form.Control
+                      type="datetime-local"
+                      step="60"
+                      value={dueOn}
+                      onChange={(e) => setDueOn(e.target.value)}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group controlId="wd-available-from">
+                    <Form.Label className="fw-semibold">Available from</Form.Label>
+                    <Form.Control
+                      type="datetime-local"
+                      step="60"
+                      value={availableOn}
+                      onChange={(e) => setAvailableOn(e.target.value)}
+                    />
+                  </Form.Group>
+                </Col>
+                <Col xs={6}>
+                  <Form.Group controlId="wd-available-until">
+                    <Form.Label className="fw-semibold">Until</Form.Label>
+                    <Form.Control
+                      type="datetime-local"
+                      step="60"
+                      value={availableUntil}
+                      onChange={(e) => setAvailableUntil(e.target.value)}
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+            </div>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col sm={12} md={8} lg={7}>
+            <hr className="my-4" />
+          </Col>
+        </Row>
+
+        {/* Actions */}
+        <Row>
+          <Col sm={3} md={2} />
+          <Col
+            sm={9}
+            md={6}
+            lg={5}
+            className="d-flex justify-content-end gap-2"
           >
-            Cancel
-          </Button>
-          {editMode ? (
-            <Button
-              variant="danger"
-              id="wd-save-assignment"
-              onClick={() => {
-                dispatch(updateAssignment(assignmentState));
-                redirect(`/Courses/${cid}/Assignments/`);
-              }}
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="btn btn-light"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              className="btn btn-danger"
             >
               Save
-            </Button>
-          ) : (
-            <Button
-              variant="danger"
-              id="wd-add-assignment"
-              onClick={() => {
-                dispatch(addAssignment(assignmentState));
-                redirect(`/Courses/${cid}/Assignments/`);
-              }}
-            >
-              Add
-            </Button>
-          )}
-        </div>
-      )}
+            </button>
+          </Col>
+        </Row>
+      </Form>
     </Container>
   );
 }

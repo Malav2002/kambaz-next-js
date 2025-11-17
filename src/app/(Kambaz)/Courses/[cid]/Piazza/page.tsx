@@ -1,7 +1,7 @@
 export default function Piazza() {
-  return (
-    <div>
-      <p>This is the Piazza page for the course.</p>
-    </div>
-  );
+    return (
+        <div id="wd-piazza">
+            <h3>Piazza</h3>
+        </div>
+    );
 }

@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 
 export default async function CoursesPage({
-  params,
+    params,
 }: {
-  params: Promise<{ cid: string }>;
+    params: Promise<{ cid: string }>;
 }) {
-  const { cid } = await params;
-  redirect(`/Courses/${cid}/Home`);
+    const { cid } = await params;
+    redirect(`/Courses/${cid}/Home`);
 }

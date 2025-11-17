@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import {
   Button,
   Dropdown,
@@ -7,9 +9,10 @@ import {
 } from "react-bootstrap";
 import { FaPlus } from "react-icons/fa6";
 import GreenCheckmark from "./GreenCheckmark";
-import { IoBanOutline } from "react-icons/io5";
-import { useState } from "react";
+import UnpublishIcon from "./UnpublishIcon";
 import ModuleEditor from "./ModuleEditor";
+import { useSelector } from "react-redux";
+
 export default function ModulesControls({
   moduleName,
   setModuleName,
@@ -22,9 +25,12 @@ export default function ModulesControls({
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const isStudent = currentUser?.role === "STUDENT";
+
   return (
     <div id="wd-modules-controls" className="text-nowrap">
-      <Button
+      {!isStudent && ( <Button
         variant="danger"
         size="lg"
         className="me-1 float-end"
@@ -33,15 +39,13 @@ export default function ModulesControls({
       >
         <FaPlus className="position-relative me-2" style={{ bottom: "1px" }} />
         Module
-      </Button>
+      </Button> )}
+
       <Dropdown className="float-end me-2">
         <DropdownToggle variant="secondary" size="lg" id="wd-publish-all-btn">
           <GreenCheckmark /> Publish All
         </DropdownToggle>
         <DropdownMenu>
-          <DropdownItem id="wd-publish-all">
-            <GreenCheckmark /> Publish All
-          </DropdownItem>
           <DropdownItem id="wd-publish-all-modules-and-items">
             <GreenCheckmark /> Publish all modules and items
           </DropdownItem>
@@ -49,13 +53,14 @@ export default function ModulesControls({
             <GreenCheckmark /> Publish modules only
           </DropdownItem>
           <DropdownItem id="wd-unpublish-all-modules-and-items">
-            <IoBanOutline /> Unpublish all modules and items
+            <UnpublishIcon /> Unpublish all modules and items
           </DropdownItem>
           <DropdownItem id="wd-unpublish-modules-only">
-            <IoBanOutline /> Unpublish modules only
+            <UnpublishIcon /> Unpublish modules only
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
+
       <Button
         variant="secondary"
         size="lg"
@@ -72,6 +77,7 @@ export default function ModulesControls({
       >
         Collapse All
       </Button>
+
       <ModuleEditor
         show={show}
         handleClose={handleClose}
@@ -79,7 +85,7 @@ export default function ModulesControls({
         moduleName={moduleName}
         setModuleName={setModuleName}
         addModule={addModule}
-      />
+      /> 
     </div>
   );
 }

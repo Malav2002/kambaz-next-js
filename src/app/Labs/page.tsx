@@ -15,18 +15,21 @@ export default function Labs() {
       >
         GitHub Frontend Repository
       </a>
+      <br />
       <a
         href="https://github.com/Malav2002/kambaz-node-server-app"
         id="wd-github"
       >
         GitHub Backend Repository 
       </a>
+      <br />
       <a
         href="https://kambaz-node-server-app-5kup.onrender.com"
         id="wd-github"
       >
         Render
       </a>
+      <br />
       <br />
       <h1>Labs</h1>
       <ul>

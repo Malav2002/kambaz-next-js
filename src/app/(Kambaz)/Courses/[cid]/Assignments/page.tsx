@@ -1,164 +1,94 @@
-"use client";
-import { useParams } from "next/navigation";
+"use client"
 import Link from "next/link";
-import ListGroup from "react-bootstrap/esm/ListGroup";
-import ListGroupItem from "react-bootstrap/esm/ListGroupItem";
-import ModuleControlButtons from "./ModuleControlButtons";
-import ModulesControls from "./ModulesControls";
+import { ListGroup, ListGroupItem } from "react-bootstrap";
+
+import AssignmentControls from "./AssignmentControls";
 import AssignmentControlButtons from "./AssignmentControlButtons";
-import { BsGripVertical } from "react-icons/bs";
-import { BsFillCaretDownFill } from "react-icons/bs";
-import { BsPencilSquare } from "react-icons/bs";
+import AssignmentListButtons from "./AssignmentListButtons";
+import AssignmentDropButton from "./AssignmentDropButton";
+import { useParams } from "next/navigation";
+import * as db from "../../../Database";
+import { RootState } from "../../../store";
+
 import { useSelector, useDispatch } from "react-redux";
+import { setAssignments, addAssignment, deleteAssignment, updateAssignment, editAssignment } from "./reducer";
 import { useState, useEffect } from "react";
-import { Modal, Button } from "react-bootstrap";
-import { setAssignments, deleteAssignment, type Assignment } from "./reducer";
+import AssignmentLessonButtons from "./AssignmentLessonButton";
+import LessonControlButtons from "../Modules/LessonControlButtons";
 import * as client from "../../client";
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-const formatDateTime = (value?: string | null) => {
-  if (!value) {
-    return "TBD";
-  }
-  const [datePart, timePart] = value.split("T");
-  if (!datePart || !timePart) {
-    return value;
-  }
-  const [year, month, day] = datePart.split("-").map(Number);
-  const [hourRaw, minuteRaw] = timePart.split(":").map(Number);
-  if ([year, month, day, hourRaw, minuteRaw].some((num) => Number.isNaN(num))) {
-    return value;
-  }
-
-  const period = hourRaw >= 12 ? "pm" : "am";
-  const hour12 = ((hourRaw + 11) % 12) + 1;
-  const monthLabel = MONTHS[month - 1] ?? month.toString();
-  const minuteLabel = minuteRaw.toString().padStart(2, "0");
-
-  return `${monthLabel} ${day} at ${hour12}:${minuteLabel}${period}`;
-};
-
 export default function Assignments() {
-    const { cid } = useParams<{ cid: string }>();
-    const dispatch = useDispatch();
-    const { assignments } = useSelector((state: { assignmentsReducer: { assignments: Assignment[] } }) => state.assignmentsReducer);
-    const { currentUser } = useSelector((state: any) => state.accountReducer);
+    const { cid } = useParams();
+    const get_t = (a: Date) => {
+        const date = a.toLocaleDateString('en-US', {month: 'short', day: '2-digit'});
+        const t = a.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true}).substring(0, 5);
+        const z = a.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: true}).substring(6, 8).toLowerCase();
+        return `${date} at ${t}${z}`;
+    }
 
-    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [assignmentToDelete, setAssignmentToDelete] = useState<{ _id: string; title: string } | null>(null);
+    const { currentUser } = useSelector((state: RootState) => state.accountReducer)
+
+    const { assignments } = useSelector((state: RootState) => state.assignmentsReducer);
+    const dispatch = useDispatch();
+
+    const fetchAssignments = async () => {
+        const assignments = await client.findAssignmentsForCourse(String(cid));
+        dispatch(setAssignments(assignments));
+    }
+
+    const onDeleteAssignment = async (assignmentId: string) => {
+        await client.deleteAssignment(assignmentId);
+        dispatch(setAssignments([...assignments.filter((assignment: any) => assignment._id !== assignmentId)]))
+    }
+
+    let open = "block"
+
+    if (currentUser?.role !== "FACULTY") {
+        open = "none"
+    }
 
     useEffect(() => {
-      const fetchAssignments = async () => {
-        if (!cid || Array.isArray(cid)) return;
-        try {
-          const fetchedAssignments = await client.findAssignmentsForCourse(cid);
-          dispatch(setAssignments(fetchedAssignments));
-        } catch (error) {
-          console.error(error);
-        }
-      };
-      fetchAssignments();
-    }, [cid, dispatch]);
+        fetchAssignments();
+    }, [])
 
-    const handleDeleteClick = (assignmentId: string, assignmentTitle: string) => {
-      setAssignmentToDelete({ _id: assignmentId, title: assignmentTitle });
-      setShowDeleteDialog(true);
-    };
-
-    const handleConfirmDelete = async () => {
-      if (assignmentToDelete) {
-        try {
-          await client.deleteAssignment(assignmentToDelete._id);
-          dispatch(deleteAssignment(assignmentToDelete._id));
-          setShowDeleteDialog(false);
-          setAssignmentToDelete(null);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    };
-
-    const handleCancelDelete = () => {
-      setShowDeleteDialog(false);
-      setAssignmentToDelete(null);
-    };
-
-    const isStudent = currentUser?.role === "STUDENT"
-    
     return (
-      <div id="wd-assignments">
-        <div className="clearfix mb-4">
-          <ModulesControls />
-        </div>
-        <ListGroup className="rounded-0" id="wd-assignments">
-          <ListGroupItem className="wd-assignments-title p-0 mb-5 fs-5 border-gray">
-            <div className="wd-title p-3 ps-2 bg-secondary d-flex align-items-center justify-content-between">
-              <div className="d-flex align-items-center">
-                <BsGripVertical className="me-2 fs-3" /> <BsFillCaretDownFill className="me-2 fs-5" />
-                ASSIGNMENTS{" "}
-              </div>
-              <div className="d-flex align-items-center">
-                <span className="badge rounded-pill border border-black bg-secondary text-black fw-semibold px-3 py-2">
-                  40% of Total
-                </span>
-                <AssignmentControlButtons />
-              </div>
-            </div>
-            <ListGroup
-              className="wd-assignment-list rounded-0"
-              id="wd-assignment-list"
-            >
-              {assignments.map((assignment: Assignment) => (
-                  <ListGroupItem
-                    key={assignment._id}
-                    className="wd-assignment-list-item list-group-item-action p-3 ps-1 d-flex justify-content-between align-items-center"
-                  >
-                    <span className="d-flex align-items-center me-2">
-                      <BsGripVertical className="fs-3" />
-                      {!isStudent && (
-                        <BsPencilSquare className="text-success me-2 fs-4" />
-                      )}
-                    </span>
-                    <Link
-                      href={`/Courses/${cid}/Assignments/${assignment._id}`}
-                      className="d-flex text-decoration-none flex-grow-1 me-3"
-                    >
-                      <span>
-                        <span className="wd-assignment-link fw-semibold text-decoration-none text-black fs-5">
-                          {assignment.title}
-                        </span>
-                        <div className="wd-assignment-details text-body-secondary">
-                        <span className="text-danger">Multiple Modules</span>{" "} | <strong>Not available until</strong> {formatDateTime(assignment.availableOn)} |{" "}
-                          <strong>Due</strong> {formatDateTime(assignment.dueOn)} | {assignment.points ?? 0} pts
+        <div id="wd-assignments">
+            <AssignmentControls
+                assignmentCId={cid} show={open}
+            /><br /><br /><br /><br />
+            <ListGroup className="rounded-0" id="wd-assignment-list">
+                <ListGroupItem className="p-0 mb-5 fs-5 border-gray">
+                    <div className="p-3 ps-2 pb-4 pt-4 bg-secondary d-flex align-items-center justify-content-between">
+                        <div>
+                            <AssignmentDropButton />
+                            <span id="wd-assignments-title" className="fs-4"><b>ASSIGNMENTS</b></span> 
                         </div>
-                      </span>
-                    </Link>
-                    {!isStudent && ( <ModuleControlButtons
-                      onDelete={() => handleDeleteClick(assignment._id, assignment.title)}
-                    /> )}
-                  </ListGroupItem>
-                ))}
-            </ListGroup>
-          </ListGroupItem>
-        </ListGroup>
+                        <AssignmentControlButtons />
+                    </div>
 
-        <Modal show={showDeleteDialog} onHide={handleCancelDelete} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>Delete Assignment</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            Are you sure you want to delete <strong>{assignmentToDelete?.title}</strong>? This action cannot be undone.
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleCancelDelete}>
-              Cancel
-            </Button>
-            <Button variant="danger" onClick={handleConfirmDelete}>
-              Delete
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
-    );
-  }
+                    <ListGroup className="rounded-0">
+                        {assignments
+                            .filter((assignment) => assignment.course === cid)
+                            .map((assignment) => (
+                                <ListGroupItem key={assignment._id} className="wd-assignment-list-item p-3 ps-1 d-flex justify-content-between align-items-center">
+                                    <div className="d-flex align-items-center">
+                                        <AssignmentListButtons />
+                                        <div className="ms-3 me-5">
+                                            <Link onClick={() => dispatch(editAssignment(assignment._id))} href={`/Courses/${cid}/Assignments/${assignment._id}`} className="wd-assignment-link text-black text-decoration-none">
+                                                <b>{assignment.title}</b> <br />
+                                            </Link>
+                                            <span className="fs-6 mb-0"><span className="text-danger">Multiple Modules</span> | <b>Not available until </b> 
+                                                  {get_t(new Date(assignment.available))} | <b>Due</b> {get_t(new Date(assignment.due))} | {assignment.points} pts</span>
+                                        </div>
+                                    </div>
+                                    <AssignmentLessonButtons assignmentId={assignment._id} 
+                                        deleteAssignment={(assignmentId) => {onDeleteAssignment(assignmentId)}} deleteShow={open}/>
+                                </ListGroupItem>
+                            ))}
+                    </ListGroup>
+                </ListGroupItem>
+            </ListGroup>
+
+        </div>
+    )
+}

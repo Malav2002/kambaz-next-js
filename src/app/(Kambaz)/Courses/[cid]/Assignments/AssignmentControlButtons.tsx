@@ -1,23 +1,17 @@
-"use client";
-
-import { useParams } from "next/navigation";
-import Link from "next/link";
-import { IoEllipsisVertical } from "react-icons/io5";
+import React from 'react'
 import { BsPlus } from "react-icons/bs";
+import { IoEllipsisVertical } from "react-icons/io5";
+
 
 export default function AssignmentControlButtons() {
-  const { cid } = useParams<{ cid: string }>();
-
   return (
-    <div className="float-end">
-      <Link
-        href={`/Courses/${cid}/Assignments/new?new=true`}
-        className="btn btn-link text-decoration-none text-dark p-0 me-2"
-        id="wd-add-assignment-btn"
-      >
-        <BsPlus className="fs-2" />
-      </Link>
-      <IoEllipsisVertical className="fs-4" />
+    <div className="float-end text-nowrap">
+      <div className="d-flex align-items-center">
+        <span className="fs-5 pt-1 pb-1 ps-2 pe-2 assignment-span-border me-2">
+            40% of Total</span>
+        <BsPlus className="me-4 fs-2"/>
+        <IoEllipsisVertical className="fs-4"/>
+      </div>
     </div>
-  );
+  )
 }

@@ -1,15 +1,15 @@
 import { MdDoNotDisturbAlt } from "react-icons/md";
-import {
-    FaCheckCircle,
-    FaHome,
-    FaBullhorn,
-    FaChartBar,
-    FaBell,
-} from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
 import { BiImport } from "react-icons/bi";
-import { LiaFileImportSolid } from "react-icons/lia";
-import { BsViewList } from "react-icons/bs";
 import { Button } from "react-bootstrap";
+import { LiaFileImportSolid } from "react-icons/lia";
+import { IoMdHome } from "react-icons/io";
+import { RiBarChart2Fill } from "react-icons/ri";
+import { TfiAnnouncement } from "react-icons/tfi";
+import { IoIosNotifications } from "react-icons/io";
+
+
+
 
 export default function CourseStatus() {
     return (
@@ -18,54 +18,44 @@ export default function CourseStatus() {
             <div className="d-flex">
                 <div className="w-50 pe-1">
                     <Button variant="secondary" size="lg" className="w-100 text-nowrap">
-                        <MdDoNotDisturbAlt className="me-2 fs-5" />
-                        Unpublish
+                        <MdDoNotDisturbAlt className="me-2 fs-5" /> Unpublish
                     </Button>
                 </div>
+
                 <div className="w-50">
                     <Button variant="success" size="lg" className="w-100">
-                        <FaCheckCircle className="me-2 fs-5" />
-                        Publish
+                        <FaCheckCircle className="me-2 fs-5" /> Publish
                     </Button>
                 </div>
             </div>
-
             <br />
-
             <Button variant="secondary" size="lg" className="w-100 mt-1 text-start">
-                <BiImport className="me-2 fs-5" />
-                Import Existing Content
+                <BiImport className="me-2 fs-5" /> Import Existing Content 
+            </Button>
+            <Button variant="secondary" size="lg" className="w-100 mt-1 text-start">
+                <LiaFileImportSolid className="me-2 fs-5" /> Import from Commons
             </Button>
 
             <Button variant="secondary" size="lg" className="w-100 mt-1 text-start">
-                <LiaFileImportSolid className="me-2 fs-5" />
-                Import from Commons
+                <IoMdHome className="me-2 fs-5" /> Choose Home Page
             </Button>
 
             <Button variant="secondary" size="lg" className="w-100 mt-1 text-start">
-                <FaHome className="me-2 fs-5" />
-                Choose Home Page
+                <RiBarChart2Fill className="me-2 fs-5" /> View Course Stream
             </Button>
 
             <Button variant="secondary" size="lg" className="w-100 mt-1 text-start">
-                <BsViewList className="me-2 fs-5" />
-                View Course Screen
+                <TfiAnnouncement className="me-2 fs-5" /> New Announcement
             </Button>
 
             <Button variant="secondary" size="lg" className="w-100 mt-1 text-start">
-                <FaBullhorn className="me-2 fs-5" />
-                New Announcement
+                <RiBarChart2Fill className="me-2 fs-5" /> New Analytics
             </Button>
 
             <Button variant="secondary" size="lg" className="w-100 mt-1 text-start">
-                <FaChartBar className="me-2 fs-5" />
-                New Analytics
-            </Button>
+                <IoIosNotifications className="me-2 fs-5" /> View Course Notification
 
-            <Button variant="secondary" size="lg" className="w-100 mt-1 text-start">
-                <FaBell className="me-2 fs-5" />
-                View Course Notifications
             </Button>
         </div>
-    );
+    )
 }

@@ -13,7 +13,19 @@ export default function Labs() {
         href="https://github.com/Malav2002/kambaz-next-js"
         id="wd-github"
       >
-        GitHub Repository
+        GitHub Frontend Repository
+      </a>
+      <a
+        href="https://github.com/Malav2002/kambaz-node-server-app"
+        id="wd-github"
+      >
+        GitHub Backend Repository 
+      </a>
+      <a
+        href="https://kambaz-node-server-app-5kup.onrender.com"
+        id="wd-github"
+      >
+        Render
       </a>
       <br />
       <h1>Labs</h1>

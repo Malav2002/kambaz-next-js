@@ -1,57 +1,80 @@
 "use client";
-import { ReactNode, useEffect } from "react";
-import { useState } from "react";
+import { ReactNode } from "react";
 import CourseNavigation from "./Navigation";
-import { useSelector } from "react-redux";
-import { useParams } from "next/navigation";
 import { FaAlignJustify } from "react-icons/fa6";
-import { courses } from "../../Database";
 import Breadcrumb from "./Breadcrumb";
-import { Button } from "react-bootstrap";
-import { RootState } from "../../store";
+import { useSelector, useDispatch } from "react-redux";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
+import type { User } from "../../Account/reducer";
+import { setCourses } from "../reducer";
 import * as client from "../client";
 
+type Course = {
+  _id: string;
+  name: string;
+  [key: string]: unknown;
+};
 
-export default function CoursesLayout(
-    { children }: Readonly<{ children: ReactNode }>) {
-        const { cid } = useParams();
-        // const { courses } = useSelector((state: RootState) => state.coursesReducer);
-        // const course = courses.find((course: any) => course._id === cid);
-        const [open, setOpen] = useState("block");
-        
-        const handleOpen = () => {
-            open === "block" ? setOpen("none") : setOpen("block")
+type CoursesState = {
+  courses: Course[];
+};
+
+export default function CoursesLayout({
+  children,
+}: Readonly<{
+  children: ReactNode;
+}>) {
+  const { cid } = useParams();
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const { courses } = useSelector((state: { coursesReducer: CoursesState }) => state.coursesReducer);
+  const { currentUser } = useSelector((state: { accountReducer: { currentUser: User | null } }) => state.accountReducer);
+
+  const course = courses.filter((c: Course) => c && c._id).find((course: Course) => course._id === cid);
+
+  useEffect(() => {
+    if (currentUser && courses.length === 0) {
+      const fetchCourses = async () => {
+        try {
+          const fetchedCourses = await client.findMyCourses();
+          dispatch(setCourses(fetchedCourses));
+        } catch (error) {
+          console.error(error);
         }
-
-        const [course, setCourse] = useState<any>()
-        
-        const getSpecificCourse = async () => {
-            const course = await client.getSpecificCourse(String(cid));
-            setCourse(course);
-        }
-
-        useEffect(() => {
-            getSpecificCourse();
-        }, []);
-
-        return (
-
-            <div id="wd-courses">
-                <h2 className="text-danger">
-                    <Button onClick={handleOpen} variant="none" className="text-danger me-4" >
-                        <FaAlignJustify className="fs-4 mb-1 text-danger" />
-                    </Button>
-                    {course?.name}
-                    
-                </h2> <hr />
-                <div className="d-flex">
-                    <div className={`d-none d-md-${open}`}>
-                        <CourseNavigation />
-                    </div>
-                    <div className="flex-fill">
-                        {children}
-                    </div>
-                </div>
-            </div>
-        );
+      };
+      fetchCourses();
     }
+  }, [currentUser, courses.length, dispatch]);
+
+  useEffect(() => {
+    if (currentUser && cid && !Array.isArray(cid)) {
+      if (courses.length === 0) {
+        return;
+      }
+      const isEnrolled = courses.filter((c: Course) => c && c._id).some((c: Course) => c._id === cid);
+      const isFaculty = currentUser.role === "FACULTY";
+
+      if (!isEnrolled && !isFaculty) {
+        router.push("/Dashboard");
+      }
+    }
+  }, [currentUser, cid, courses, router]);
+
+  return (
+    <div id="wd-courses">
+      <h2 className="text-danger">
+        <FaAlignJustify className="me-4 fs-4 mb-1" />
+        <Breadcrumb course={course} />
+      </h2>
+      <hr />
+      <div className="d-flex">
+        <div className="d-none d-md-block">
+          <CourseNavigation />
+        </div>
+        <div className="flex-fill">{children}</div>
+      </div>
+    </div>
+  );
+}

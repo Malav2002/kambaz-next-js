@@ -1,17 +1,32 @@
-import React from 'react'
-import { BsPlus } from "react-icons/bs";
+"use client";
+
+import { useParams } from "next/navigation";
+import Link from "next/link";
 import { IoEllipsisVertical } from "react-icons/io5";
+import { BsPlus } from "react-icons/bs";
+
+export default function AssignmentControlButtons({
+  currentUser,
+}: {
+  currentUser?: { role: string } | null;
+}) {
+  const { cid } = useParams<{ cid: string }>();
 
 
-export default function AssignmentControlButtons() {
+  const canEdit = currentUser?.role === "ADMIN" || currentUser?.role === "FACULTY";
+
   return (
-    <div className="float-end text-nowrap">
-      <div className="d-flex align-items-center">
-        <span className="fs-5 pt-1 pb-1 ps-2 pe-2 assignment-span-border me-2">
-            40% of Total</span>
-        <BsPlus className="me-4 fs-2"/>
-        <IoEllipsisVertical className="fs-4"/>
-      </div>
+    <div className="float-end">
+      {canEdit && (
+        <Link
+          href={`/Courses/${cid}/Assignments/new?new=true`}
+          className="btn btn-link text-decoration-none text-dark p-0 me-2"
+          id="wd-add-assignment-btn"
+        >
+          <BsPlus className="fs-2" />
+        </Link>
+      )}
+      <IoEllipsisVertical className="fs-4" />
     </div>
-  )
+  );
 }

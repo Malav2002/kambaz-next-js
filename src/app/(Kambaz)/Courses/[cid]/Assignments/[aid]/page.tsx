@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addAssignment, updateAssignment } from "../reducer";
 import * as client from "../../../client";
+import * as userClient from "../../../../Account/client"; // Adjust path as needed
 
 export default function AssignmentPage() {
   const { cid, aid } = useParams<{ cid: string; aid: string }>();
@@ -30,6 +31,23 @@ export default function AssignmentPage() {
   const [dueOn, setDueOn] = useState("");
   const [availableOn, setAvailableOn] = useState("");
   const [availableUntil, setAvailableUntil] = useState("");
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // Check if user is ADMIN or FACULTY
+  const canEdit = currentUser?.role === "ADMIN" || currentUser?.role === "FACULTY";
+
+  // Fetch current user
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const user = await userClient.profile(); // Adjust based on your API
+        setCurrentUser(user);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
+    };
+    fetchCurrentUser();
+  }, []);
 
   // Initialize form with existing assignment data
   useEffect(() => {
@@ -44,6 +62,11 @@ export default function AssignmentPage() {
   }, [isNew, existingAssignment]);
 
   const handleSave = async () => {
+    if (!canEdit) {
+      alert("You do not have permission to save assignments");
+      return;
+    }
+
     if (!title.trim()) {
       alert("Please enter an assignment name");
       return;
@@ -52,8 +75,8 @@ export default function AssignmentPage() {
     if (!cid || Array.isArray(cid)) return;
 
     try {
-    if (isNew) {
-      // Create new assignment
+      if (isNew) {
+        // Create new assignment
         const newAssignment = await client.createAssignmentForCourse(cid, {
           title,
           description,
@@ -63,8 +86,8 @@ export default function AssignmentPage() {
           availableUntil: availableUntil || null,
         });
         dispatch(addAssignment(newAssignment));
-    } else if (existingAssignment) {
-      // Update existing assignment
+      } else if (existingAssignment) {
+        // Update existing assignment
         const updatedAssignment = await client.updateAssignment({
           ...existingAssignment,
           title,
@@ -75,10 +98,10 @@ export default function AssignmentPage() {
           availableUntil: availableUntil || null,
         });
         dispatch(updateAssignment(updatedAssignment));
-    }
+      }
 
-    // Navigate back to assignments
-    router.push(`/Courses/${cid}/Assignments`);
+      // Navigate back to assignments
+      router.push(`/Courses/${cid}/Assignments`);
     } catch (error) {
       console.error(error);
       alert("Failed to save assignment. Please try again.");
@@ -102,6 +125,7 @@ export default function AssignmentPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Enter assignment name"
+                disabled={!canEdit}
               />
             </Form.Group>
           </Col>
@@ -118,6 +142,7 @@ export default function AssignmentPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter assignment description"
+                disabled={!canEdit}
               />
             </Form.Group>
           </Col>
@@ -134,6 +159,7 @@ export default function AssignmentPage() {
               type="number"
               value={points}
               onChange={(e) => setPoints(Number(e.target.value))}
+              disabled={!canEdit}
             />
           </Col>
         </Row>
@@ -144,7 +170,7 @@ export default function AssignmentPage() {
             <Form.Label htmlFor="wd-group">Assignment Group</Form.Label>
           </Col>
           <Col sm={9} md={6} lg={5}>
-            <Form.Select id="wd-group" defaultValue="ASSIGNMENTS">
+            <Form.Select id="wd-group" defaultValue="ASSIGNMENTS" disabled={!canEdit}>
               <option>ASSIGNMENTS</option>
             </Form.Select>
           </Col>
@@ -156,7 +182,7 @@ export default function AssignmentPage() {
             <Form.Label htmlFor="wd-display-grade-as">Display Grade as</Form.Label>
           </Col>
           <Col sm={9} md={6} lg={5}>
-            <Form.Select id="wd-display-grade-as" defaultValue="Percentage">
+            <Form.Select id="wd-display-grade-as" defaultValue="Percentage" disabled={!canEdit}>
               <option>Percentage</option>
             </Form.Select>
           </Col>
@@ -173,6 +199,7 @@ export default function AssignmentPage() {
                 id="wd-submission-type"
                 className="mb-3"
                 defaultValue="Online"
+                disabled={!canEdit}
               >
                 <option>Online</option>
               </Form.Select>
@@ -183,24 +210,32 @@ export default function AssignmentPage() {
                 id="wd-text-entry"
                 className="mb-2"
                 label="Text Entry"
+                disabled={!canEdit}
               />
               <Form.Check
                 id="wd-website-url"
                 className="mb-2"
                 label="Website URL"
                 defaultChecked
+                disabled={!canEdit}
               />
               <Form.Check
                 id="wd-media-recordings"
                 className="mb-2"
                 label="Media Recordings"
+                disabled={!canEdit}
               />
               <Form.Check
                 id="wd-student-annotation"
                 className="mb-2"
                 label="Student Annotation"
+                disabled={!canEdit}
               />
-              <Form.Check id="wd-file-upload" label="File Uploads" />
+              <Form.Check 
+                id="wd-file-upload" 
+                label="File Uploads"
+                disabled={!canEdit}
+              />
             </div>
           </Col>
         </Row>
@@ -216,7 +251,11 @@ export default function AssignmentPage() {
                 <Form.Label htmlFor="wd-assign-to" className="fw-semibold">
                   Assign to
                 </Form.Label>
-                <Form.Control id="wd-assign-to" defaultValue="Everyone" />
+                <Form.Control 
+                  id="wd-assign-to" 
+                  defaultValue="Everyone"
+                  disabled={!canEdit}
+                />
               </Form.Group>
 
               <Row className="g-3">
@@ -228,6 +267,7 @@ export default function AssignmentPage() {
                       step="60"
                       value={dueOn}
                       onChange={(e) => setDueOn(e.target.value)}
+                      disabled={!canEdit}
                     />
                   </Form.Group>
                 </Col>
@@ -239,6 +279,7 @@ export default function AssignmentPage() {
                       step="60"
                       value={availableOn}
                       onChange={(e) => setAvailableOn(e.target.value)}
+                      disabled={!canEdit}
                     />
                   </Form.Group>
                 </Col>
@@ -250,6 +291,7 @@ export default function AssignmentPage() {
                       step="60"
                       value={availableUntil}
                       onChange={(e) => setAvailableUntil(e.target.value)}
+                      disabled={!canEdit}
                     />
                   </Form.Group>
                 </Col>
@@ -264,31 +306,33 @@ export default function AssignmentPage() {
           </Col>
         </Row>
 
-        {/* Actions */}
-        <Row>
-          <Col sm={3} md={2} />
-          <Col
-            sm={9}
-            md={6}
-            lg={5}
-            className="d-flex justify-content-end gap-2"
-          >
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="btn btn-light"
+        {/* Actions - Only show if user can edit */}
+        {canEdit && (
+          <Row>
+            <Col sm={3} md={2} />
+            <Col
+              sm={9}
+              md={6}
+              lg={5}
+              className="d-flex justify-content-end gap-2"
             >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              className="btn btn-danger"
-            >
-              Save
-            </button>
-          </Col>
-        </Row>
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="btn btn-light"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSave}
+                className="btn btn-danger"
+              >
+                Save
+              </button>
+            </Col>
+          </Row>
+        )}
       </Form>
     </Container>
   );

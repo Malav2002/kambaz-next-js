@@ -1,8 +1,34 @@
-import { IoEllipsisVertical } from "react-icons/io5";
+import { FaTrash } from "react-icons/fa";
+import { FaPencil } from "react-icons/fa6";
 import GreenCheckmark from "./GreenCheckmark";
-export default function LessonControlButtons() {
+import { BsPlus } from "react-icons/bs";
+import { IoEllipsisVertical } from "react-icons/io5";
+
+export default function LessonControlButtons({
+  currentUser,
+}: {
+  currentUser?: { role: string } | null;
+}) {
+  // Check if user is ADMIN or FACULTY
+  const canEdit = currentUser?.role === "ADMIN" || currentUser?.role === "FACULTY";
+
   return (
     <div className="float-end">
+      {canEdit && (
+        <>
+          <FaPencil
+            className="text-primary me-3"
+            style={{ cursor: "pointer" }}
+          />
+          <FaTrash
+            className="text-danger me-3 mb-1"
+            style={{ cursor: "pointer" }}
+          />
+        </>
+      )}
       <GreenCheckmark />
+      {canEdit && <BsPlus className="fs-1" />}
       <IoEllipsisVertical className="fs-4" />
-    </div> );}
+    </div>
+  );
+}
